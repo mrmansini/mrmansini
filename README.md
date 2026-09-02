@@ -23,9 +23,22 @@ Sou Analista de Dados formado em Economia. Não paro na query: entendo o número
 
 ## Projetos em destaque
 
-*(em construção)*
+### 📊 [pipeline-indicadores-bcb](https://github.com/mrmansini/pipeline-indicadores-bcb)
 
-- 🔜 `pipeline-indicadores-bcb` — ingestão de indicadores econômicos (Selic, IPCA, câmbio) via API do BCB, carga incremental em PostgreSQL, dashboard Power BI
+Pipeline que coleta indicadores econômicos do Banco Central (Selic, IPCA, câmbio, IBC-Br) e entrega em dashboard, rodando sozinho todo dia.
+
+Carga incremental idempotente em PostgreSQL, seis validações de qualidade que reprovam a execução quando o dado não confere, e execução diária automatizada via GitHub Actions. A camada analítica alimenta Power BI e Looker Studio sem transformação intermediária.
+
+O README documenta o que a API do SGS não conta na documentação — inclusive o fato de ela responder HTTP 200 com página de erro em HTML.
+
+**[Ver dashboard ao vivo →](https://lookerstudio.google.com/reporting/387b4bf3-1c9c-4a06-9dc5-3f596da96aae)**
+
+`Python` `PostgreSQL` `GitHub Actions` `Power BI` `Looker Studio`
+
+---
+
+**Em construção:**
+
 - 🔜 `automacao-n8n-...` — automação replicável exportada em JSON
 - 🔜 `sql-modelagem-...` — schema PostgreSQL + queries analíticas
 - 🔜 `dashboard-powerbi-...` — relatório publicado na web
