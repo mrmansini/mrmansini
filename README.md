@@ -13,8 +13,13 @@ Sou Analista de Dados formado em Economia. Não paro na query: entendo o número
 
 ## Alguns números
 
+*Como Analista de Dados, desde jan/2025:*
+
 - ⏱️ **30+ processos manuais automatizados** com n8n e Python — cerca de 80h/mês devolvidas ao time
 - 📈 **10+ dashboards estratégicos** em Power BI (operações, SLA de suporte, funil comercial)
+
+*Formação:*
+
 - 🥇 1º lugar da turma de Ciências Econômicas na UEL (Honra ao Mérito)
 
 ## Stack
