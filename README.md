@@ -7,19 +7,17 @@ Sou Analista de Dados formado em Economia. Não paro na query: entendo o número
 ## O que eu faço
 
 - 🔌 **Ingestão** — integrações via API REST (CRM, plataformas web, planilhas), tratando token, paginação, falha e reprocessamento.
-- 🗄️ **Armazenamento** — modelagem e manutenção de bases PostgreSQL como fonte única da verdade.
+- 🗄️ **Armazenamento** — modelagem dimensional e manutenção de bases PostgreSQL como fonte única da verdade.
 - ⚙️ **Automação** — pipelines em n8n e Python que substituem processo manual.
 - 📊 **Visualização** — dashboards em Power BI com KPIs definidos junto às áreas de negócio.
 
 ## Alguns números
 
 *Como Analista de Dados, desde jan/2025:*
-
 - ⏱️ **30+ processos manuais automatizados** com n8n e Python — cerca de 80h/mês devolvidas ao time
 - 📈 **10+ dashboards estratégicos** em Power BI (operações, SLA de suporte, funil comercial)
 
 *Formação:*
-
 - 🥇 1º lugar da turma de Ciências Econômicas na UEL (Honra ao Mérito)
 
 ## Stack
@@ -54,7 +52,21 @@ Construído durante uma indisponibilidade de seis dias do endpoint principal, o 
 
 ---
 
-🔨 Outros projetos em construção.
+### ⛽ [dw-precos-combustiveis-anp](https://github.com/mrmansini/dw-precos-combustiveis-anp)
+
+Data warehouse dimensional sobre a pesquisa semanal de preços de combustíveis da ANP: 3 milhões de observações, 14 mil postos, 3 anos e meio.
+
+Cada observação está ligada à bandeira e ao endereço que o posto tinha **naquela data**, não aos atuais — a dimensão de postos é versionada por SCD Tipo 2, e a garantia de que não existem duas vigências sobrepostas para o mesmo CNPJ está no banco, numa constraint de exclusão GiST, não no código de carga. O fato é particionado por trimestre.
+
+Isso torna possível a pergunta que o modelo existe para responder: **o que acontece com o preço quando um posto larga a bandeira?** A resposta é queda de 2,94 centavos em relação ao próprio município — pequena em reais, robusta estatisticamente. Antes de afirmar isso, o mesmo cálculo foi aplicado a 12.193 postos que nunca mudaram nada, com datas de evento falsas: o placebo veio nulo, o que descartou a hipótese de que o efeito fosse artefato do método.
+
+Os índices foram escolhidos por medição, não por hábito. Três candidatos foram testados e dois rejeitados com o plano de execução que justificou a rejeição — um deles custaria 91,5 MB para render 5%.
+
+`PostgreSQL 18` `Python` `Modelagem dimensional` `SCD Tipo 2` `Particionamento`
+
+---
+
+🔨 Próximo: dashboard público sobre este modelo.
 
 ## Um pouco de contexto
 
