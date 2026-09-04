@@ -66,8 +66,6 @@ Os índices foram escolhidos por medição, não por hábito. Três candidatos f
 
 ---
 
-🔨 Próximo: dashboard público sobre este modelo.
-
 ## Um pouco de contexto
 
 Antes de dados, passei por perícia judicial econômico-financeira, contabilidade e tesouraria — é de onde vem meu incômodo com número que não bate. Isso entrou no jeito como construo pipeline: audito o cálculo antes de confiar nele.
