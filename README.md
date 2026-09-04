@@ -24,7 +24,7 @@ Sou Analista de Dados formado em Economia. Não paro na query: entendo o número
 
 ## Stack
 
-`Python` `SQL` `PostgreSQL` `Power BI (DAX / Power Query)` `n8n` `APIs REST` `Azure (AZ-900)` `Excel avançado`
+`Python` `SQL` `PostgreSQL` `Power BI (DAX / Power Query)` `n8n` `Docker` `APIs REST` `Azure (AZ-900)` `Excel avançado`
 
 ## Projetos em destaque
 
@@ -42,11 +42,19 @@ O README documenta o que a API do SGS não conta na documentação — inclusive
 
 ---
 
-**Em construção:**
+### 🔔 [monitor-licitacoes-pncp](https://github.com/mrmansini/monitor-licitacoes-pncp)
 
-- 🔜 `automacao-n8n-...` — automação replicável exportada em JSON
-- 🔜 `sql-modelagem-...` — schema PostgreSQL + queries analíticas
-- 🔜 `dashboard-powerbi-...` — relatório publicado na web
+Automação em n8n que monitora licitações públicas no PNCP, deduplica no PostgreSQL e avisa no Telegram apenas o que é novo.
+
+O dedup mora no banco, não na ferramenta: `ON CONFLICT DO NOTHING` com `RETURNING` devolve exatamente as linhas inéditas. As respostas da API são classificadas em quatro situações — sucesso, sem resultados, erro de parâmetro e indisponibilidade —, cada uma com tratamento próprio, porque repetir uma requisição malformada é laço infinito e tratar 204 como falha é alarme falso.
+
+Construído durante uma indisponibilidade de seis dias do endpoint principal, o que forçou um modo de desenvolvimento contra resposta real salva em disco. O README registra o incidente, as hipóteses testadas — inclusive a que se mostrou errada — e o que cada falha ensinou.
+
+`n8n` `PostgreSQL` `Docker` `API REST` `Telegram Bot API`
+
+---
+
+🔨 Outros projetos em construção.
 
 ## Um pouco de contexto
 
