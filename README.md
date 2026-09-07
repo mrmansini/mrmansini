@@ -9,7 +9,7 @@ Sou Analista de Dados formado em Economia. Não paro na query: entendo o número
 - 🔌 **Ingestão** — integrações via API REST (CRM, plataformas web, planilhas), tratando token, paginação, falha e reprocessamento.
 - 🗄️ **Armazenamento** — modelagem dimensional e manutenção de bases PostgreSQL como fonte única da verdade.
 - ⚙️ **Automação** — pipelines em n8n e Python que substituem processo manual.
-- 📊 **Visualização** — dashboards em Power BI com KPIs definidos junto às áreas de negócio.
+- 📊 **Visualização** — dashboards em Power BI com KPIs definidos junto às áreas de negócio, e publicação na web quando o público é aberto.
 
 ## Alguns números
 
@@ -22,9 +22,41 @@ Sou Analista de Dados formado em Economia. Não paro na query: entendo o número
 
 ## Stack
 
-`Python` `SQL` `PostgreSQL` `Power BI (DAX / Power Query)` `n8n` `Docker` `APIs REST` `Azure (AZ-900)` `Excel avançado`
+`Python` `SQL` `PostgreSQL` `Power BI (DAX / Power Query)` `n8n` `Docker` `APIs REST` `GitHub Actions` `Azure (AZ-900)` `Excel avançado`
 
 ## Projetos em destaque
+
+### ⛽ [dashboard-precos-combustiveis](https://github.com/mrmansini/dashboard-precos-combustiveis)
+
+Dashboard público de quatro páginas sobre preços de combustíveis no Brasil: quando o etanol compensa em cada município, preço por estado e produto, o efeito da troca de bandeira, e a cobertura da própria amostra.
+
+A arquitetura é invertida em relação a um BI convencional. As consultas rodam no momento do build, dentro do GitHub Actions, e o que vai ao ar é um site estático. O banco nunca fica exposto ao visitante, não há tempo de espera para acordar o serviço, e a credencial de leitura só existe como secret de CI.
+
+As decisões visuais são apoiadas em medição, e o README explica cada uma. CSV em vez de Parquet, porque 2,88 MB viram 513 KB sob gzip. Ponto em vez de barra nos rankings de eixo cortado, porque o comprimento de uma barra é lido como proporcional e num eixo que não começa em zero isso exagera uma diferença de 21% para o que parece cinco vezes.
+
+A quarta página existe porque uma queda de preço e um encolhimento da amostra produzem o mesmo movimento na linha. Ela revelou que a série não é contínua: a cobertura tem degraus nas viradas de semestre, quando a ANP publica um arquivo novo e redefine a lista de municípios pesquisados.
+
+**[Ver dashboard ao vivo →](https://mrmansini.github.io/dashboard-precos-combustiveis/)**
+
+`Observable Framework` `D3` `Python` `PostgreSQL` `GitHub Actions` `GitHub Pages`
+
+---
+
+### 🗄️ [dw-precos-combustiveis-anp](https://github.com/mrmansini/dw-precos-combustiveis-anp)
+
+O data warehouse dimensional por trás do dashboard acima: 3 milhões de observações da pesquisa semanal da ANP, 14 mil postos, 3 anos e meio.
+
+Cada observação está ligada à bandeira e ao endereço que o posto tinha **naquela data**, não aos atuais — a dimensão de postos é versionada por SCD Tipo 2, e a garantia de que não existem duas vigências sobrepostas para o mesmo CNPJ está no banco, numa constraint de exclusão GiST, não no código de carga. O fato é particionado por trimestre.
+
+Isso torna possível a pergunta que o modelo existe para responder: **o que acontece com o preço quando um posto larga a bandeira?** A resposta é queda de 2,94 centavos em relação ao próprio município — pequena em reais, robusta estatisticamente. Antes de afirmar isso, o mesmo cálculo foi aplicado a 12.193 postos que nunca mudaram nada, com datas de evento falsas: o placebo veio nulo, o que descartou a hipótese de que o efeito fosse artefato do método.
+
+Os índices foram escolhidos por medição, não por hábito. Três candidatos foram testados e dois rejeitados com o plano de execução que justificou a rejeição — um deles custaria 91,5 MB para render 5%.
+
+A documentação registra duas hipóteses que não vingaram: um critério estatístico de corte que eliminava quatro meses de dado real junto com o defeito que deveria remover, e uma tentativa de explicar o resultado que ficou sem casos suficientes para ser testada.
+
+`PostgreSQL 18` `Python` `Modelagem dimensional` `SCD Tipo 2` `Particionamento`
+
+---
 
 ### 📊 [pipeline-indicadores-bcb](https://github.com/mrmansini/pipeline-indicadores-bcb)
 
@@ -52,23 +84,11 @@ Construído durante uma indisponibilidade de seis dias do endpoint principal, o 
 
 ---
 
-### ⛽ [dw-precos-combustiveis-anp](https://github.com/mrmansini/dw-precos-combustiveis-anp)
-
-Data warehouse dimensional sobre a pesquisa semanal de preços de combustíveis da ANP: 3 milhões de observações, 14 mil postos, 3 anos e meio.
-
-Cada observação está ligada à bandeira e ao endereço que o posto tinha **naquela data**, não aos atuais — a dimensão de postos é versionada por SCD Tipo 2, e a garantia de que não existem duas vigências sobrepostas para o mesmo CNPJ está no banco, numa constraint de exclusão GiST, não no código de carga. O fato é particionado por trimestre.
-
-Isso torna possível a pergunta que o modelo existe para responder: **o que acontece com o preço quando um posto larga a bandeira?** A resposta é queda de 2,94 centavos em relação ao próprio município — pequena em reais, robusta estatisticamente. Antes de afirmar isso, o mesmo cálculo foi aplicado a 12.193 postos que nunca mudaram nada, com datas de evento falsas: o placebo veio nulo, o que descartou a hipótese de que o efeito fosse artefato do método.
-
-Os índices foram escolhidos por medição, não por hábito. Três candidatos foram testados e dois rejeitados com o plano de execução que justificou a rejeição — um deles custaria 91,5 MB para render 5%.
-
-`PostgreSQL 18` `Python` `Modelagem dimensional` `SCD Tipo 2` `Particionamento`
-
----
-
 ## Um pouco de contexto
 
 Antes de dados, passei por perícia judicial econômico-financeira, contabilidade e tesouraria — é de onde vem meu incômodo com número que não bate. Isso entrou no jeito como construo pipeline: audito o cálculo antes de confiar nele.
+
+É também por isso que os READMEs registram as hipóteses que não vingaram. Um projeto que só mostra o que deu certo esconde a parte em que se aprende alguma coisa.
 
 ## Contato
 
