@@ -1,20 +1,20 @@
 # Olá, eu sou o Felipe 👋
 
-Construo o caminho que o dado percorre até virar decisão — **da API até o dashboard.**
+Construo o caminho que o dado percorre até virar decisão, **da API até o dashboard.**
 
 Sou Analista de Dados formado em Economia. Não paro na query: entendo o número, o processo que gerou ele e o impacto dele no negócio.
 
 ## O que eu faço
 
-- 🔌 **Ingestão** — integrações via API REST (CRM, plataformas web, planilhas), tratando token, paginação, falha e reprocessamento.
-- 🗄️ **Armazenamento** — modelagem dimensional e manutenção de bases PostgreSQL como fonte única da verdade.
-- ⚙️ **Automação** — pipelines em n8n e Python que substituem processo manual.
-- 📊 **Visualização** — dashboards em Power BI com KPIs definidos junto às áreas de negócio, e publicação na web quando o público é aberto.
+- 🔌 **Ingestão.** Integrações via API REST (CRM, plataformas web, planilhas), tratando token, paginação, falha e reprocessamento.
+- 🗄️ **Armazenamento.** Modelagem dimensional e manutenção de bases PostgreSQL como fonte única da verdade.
+- ⚙️ **Automação.** Pipelines em n8n e Python que substituem processo manual.
+- 📊 **Visualização.** Dashboards em Power BI com KPIs definidos junto às áreas de negócio, e publicação na web quando o público é aberto.
 
 ## Alguns números
 
 *Como Analista de Dados, desde jan/2025:*
-- ⏱️ **30+ processos manuais automatizados** com n8n e Python — cerca de 80h/mês devolvidas ao time
+- ⏱️ **30+ processos manuais automatizados** com n8n e Python, cerca de 80h/mês devolvidas ao time
 - 📈 **10+ dashboards estratégicos** em Power BI (operações, SLA de suporte, funil comercial)
 
 *Formação:*
@@ -22,9 +22,25 @@ Sou Analista de Dados formado em Economia. Não paro na query: entendo o número
 
 ## Stack
 
-`Python` `SQL` `PostgreSQL` `Power BI (DAX / Power Query)` `n8n` `Docker` `APIs REST` `GitHub Actions` `Azure (AZ-900)` `Excel avançado`
+`Python` `SQL` `PostgreSQL` `Databricks` `PySpark` `Delta Lake` `Power BI (DAX / Power Query)` `n8n` `Docker` `APIs REST` `GitHub Actions` `Excel avançado`
 
 ## Projetos em destaque
+
+### 🧱 [databricks-lakehouse-anp](https://github.com/mrmansini/databricks-lakehouse-anp)
+
+O mesmo data warehouse de preços de combustíveis, reconstruído no Databricks em arquitetura lakehouse, para responder onde cada arquitetura ganha e onde a ferramenta é exagero.
+
+As duas implementações foram comparadas por consulta federada, lendo o PostgreSQL de dentro do Databricks como catálogo externo. O resultado é idêntico nas sete medidas: 3.029.551 observações, 17.631 versões de posto, 1.960 trocas de bandeira, 367.142 linhas no resumo semanal. A prova é `LEFT ANTI JOIN` entre as duas bases, e não conferência de números anotados.
+
+O valor não está na equivalência em si, mas em que toda divergência encontrada no caminho tem causa identificada. O Auto Loader casa colunas pelo nome e não pela posição, o que fez três milhões de linhas caírem na coluna de resgate sem erro. O leitor remove o acento dos nomes de coluna ao fixar o schema. A fonte corrige grafia entre arquivos semestrais, e um espaço duplo que some abre versão nova na dimensão de postos.
+
+Três medições contrariam o que se espera. `OPTIMIZE` e liquid clustering não fazem diferença numa tabela de 37 MB, e o ganho aparente da primeira medição era o ambiente esquentando, o que só ficou claro com uma fase de controle. A escolha entre Spark e pandas pesou menos que a forma de escrever o código: duas funções Python dentro de um `groupby` custaram 51 vezes mais que a versão vetorizada. E a carga incremental por `MERGE` é a escolha certa no dia a dia e a errada para recarregar histórico, com ponto de equilíbrio em quatro dias.
+
+O controle de acesso do Unity Catalog foi testado com uma identidade separada, e não apenas declarado.
+
+`Databricks` `PySpark` `Delta Lake` `Unity Catalog` `Auto Loader` `Asset Bundles` `GitHub Actions`
+
+---
 
 ### ⛽ [dashboard-precos-combustiveis](https://github.com/mrmansini/dashboard-precos-combustiveis)
 
@@ -46,11 +62,11 @@ A quarta página existe porque uma queda de preço e um encolhimento da amostra 
 
 O data warehouse dimensional por trás do dashboard acima: 3 milhões de observações da pesquisa semanal da ANP, 14 mil postos, 3 anos e meio.
 
-Cada observação está ligada à bandeira e ao endereço que o posto tinha **naquela data**, não aos atuais — a dimensão de postos é versionada por SCD Tipo 2, e a garantia de que não existem duas vigências sobrepostas para o mesmo CNPJ está no banco, numa constraint de exclusão GiST, não no código de carga. O fato é particionado por trimestre.
+Cada observação está ligada à bandeira e ao endereço que o posto tinha **naquela data**, e não aos atuais. A dimensão de postos é versionada por SCD Tipo 2, e a garantia de que não existem duas vigências sobrepostas para o mesmo CNPJ está no banco, numa constraint de exclusão GiST, não no código de carga. O fato é particionado por trimestre.
 
-Isso torna possível a pergunta que o modelo existe para responder: **o que acontece com o preço quando um posto larga a bandeira?** A resposta é queda de 2,94 centavos em relação ao próprio município — pequena em reais, robusta estatisticamente. Antes de afirmar isso, o mesmo cálculo foi aplicado a 12.193 postos que nunca mudaram nada, com datas de evento falsas: o placebo veio nulo, o que descartou a hipótese de que o efeito fosse artefato do método.
+Isso torna possível a pergunta que o modelo existe para responder: **o que acontece com o preço quando um posto larga a bandeira?** A resposta é queda de 2,94 centavos em relação ao próprio município, pequena em reais e robusta estatisticamente. Antes de afirmar isso, o mesmo cálculo foi aplicado a 12.193 postos que nunca mudaram nada, com datas de evento falsas. Esse grupo de controle veio nulo, o que descartou a hipótese de que o efeito fosse artefato do método.
 
-Os índices foram escolhidos por medição, não por hábito. Três candidatos foram testados e dois rejeitados com o plano de execução que justificou a rejeição — um deles custaria 91,5 MB para render 5%.
+Os índices foram escolhidos por medição, não por hábito. Três candidatos foram testados e dois rejeitados com o plano de execução que justificou a rejeição. Um deles custaria 91,5 MB para render 5%.
 
 A documentação registra duas hipóteses que não vingaram: um critério estatístico de corte que eliminava quatro meses de dado real junto com o defeito que deveria remover, e uma tentativa de explicar o resultado que ficou sem casos suficientes para ser testada.
 
@@ -64,7 +80,7 @@ Pipeline que coleta indicadores econômicos do Banco Central (Selic, IPCA, câmb
 
 Carga incremental idempotente em PostgreSQL, seis validações de qualidade que reprovam a execução quando o dado não confere, e execução diária automatizada via GitHub Actions. A camada analítica alimenta Power BI e Looker Studio sem transformação intermediária.
 
-O README documenta o que a API do SGS não conta na documentação — inclusive o fato de ela responder HTTP 200 com página de erro em HTML.
+O README documenta o que a API do SGS não conta na documentação, inclusive o fato de ela responder HTTP 200 com página de erro em HTML.
 
 **[Ver dashboard ao vivo →](https://lookerstudio.google.com/reporting/387b4bf3-1c9c-4a06-9dc5-3f596da96aae)**
 
@@ -76,9 +92,9 @@ O README documenta o que a API do SGS não conta na documentação — inclusive
 
 Automação em n8n que monitora licitações públicas no PNCP, deduplica no PostgreSQL e avisa no Telegram apenas o que é novo.
 
-O dedup mora no banco, não na ferramenta: `ON CONFLICT DO NOTHING` com `RETURNING` devolve exatamente as linhas inéditas. As respostas da API são classificadas em quatro situações — sucesso, sem resultados, erro de parâmetro e indisponibilidade —, cada uma com tratamento próprio, porque repetir uma requisição malformada é laço infinito e tratar 204 como falha é alarme falso.
+A checagem do que já foi visto mora no banco, e não na ferramenta: `ON CONFLICT DO NOTHING` com `RETURNING` devolve exatamente as linhas inéditas. As respostas da API são classificadas em quatro situações (sucesso, sem resultados, erro de parâmetro e indisponibilidade), cada uma com tratamento próprio, porque repetir uma requisição malformada é laço infinito e tratar 204 como falha é alarme falso.
 
-Construído durante uma indisponibilidade de seis dias do endpoint principal, o que forçou um modo de desenvolvimento contra resposta real salva em disco. O README registra o incidente, as hipóteses testadas — inclusive a que se mostrou errada — e o que cada falha ensinou.
+Construído durante uma indisponibilidade de seis dias do endpoint principal, o que forçou um modo de desenvolvimento contra resposta real salva em disco. O README registra o incidente, as hipóteses testadas, inclusive a que se mostrou errada, e o que cada falha ensinou.
 
 `n8n` `PostgreSQL` `Docker` `API REST` `Telegram Bot API`
 
@@ -86,10 +102,10 @@ Construído durante uma indisponibilidade de seis dias do endpoint principal, o 
 
 ## Um pouco de contexto
 
-Antes de dados, passei por perícia judicial econômico-financeira, contabilidade e tesouraria — é de onde vem meu incômodo com número que não bate. Isso entrou no jeito como construo pipeline: audito o cálculo antes de confiar nele.
+Antes de dados, passei por perícia judicial econômico-financeira, contabilidade e tesouraria. É de onde vem meu incômodo com número que não bate. Isso entrou no jeito como construo pipeline: audito o cálculo antes de confiar nele.
 
 É também por isso que os READMEs registram as hipóteses que não vingaram. Um projeto que só mostra o que deu certo esconde a parte em que se aprende alguma coisa.
 
 ## Contato
 
-📧 felipemansini@hotmail.com · 💼 [LinkedIn](https://linkedin.com/in/felipemansini) · 📍 Rolândia, PR
+📧 felipemansini@hotmail.com · 💼 [LinkedIn](https://linkedin.com/in/felipemansini) · 📔 [Portfólio no Notion](https://felipemansini.notion.site/Portfolio-Felipe-Mansini-3c9a93018cab80bf9f9cc1105cce0e35)
